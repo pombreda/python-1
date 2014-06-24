@@ -1,3 +1,5 @@
+import math
+
 class interval:
     def __init__(self, b, e):
         self.begin = b
@@ -46,10 +48,16 @@ class interval_tree:
             return self.point_query(self.root, start, [])
         else:
             res = []
+            if not (type(start) == type(1) and
+                    type(end) == type(1)):
+                print 'Err: can only search for integer intervals, rounding'
+                start = int(math.floor(start))
+                end = int(math.ceil(end))
+
             for j in xrange(start, end+1):
                 for k in self.search(j):
                     res.append(k)
-            return _sort_by_begin(res)
+            return list(set(self._sort_by_begin(res)))
     
     def point_query(self, node, p, result):
         for k in node.Sc:
