@@ -1,9 +1,12 @@
 import math
+import random
 
 class interval:
     def __init__(self, b, e):
-        self.begin = b
-        self.end = e
+        _b = min(b,e)
+        _e = max(b,e)
+        self.begin = _b
+        self.end = _e
     def __repr__(self):
         return '[%d, %d]' %(self.begin, self.end)
 
@@ -69,10 +72,27 @@ class interval_tree:
             self.point_query(node.right, p, result)
         return list(set(result))
 
-if __name__=="__main__":
-    a = interval(1, 2)
-    b = interval(4, 7)
-    c = interval(1, 8)
-    
+def basic_test():
+    a = interval(1,2)
+    b = interval(1,8)
+    c = interval(4,7)
     tree = interval_tree([a,b,c])
-    print tree.search(3)
+    tree.search(3)
+
+def stress_test():
+    N = 100
+    intervals = []
+    for i in xrange(10000):
+        n1, n2 = random.random()*N, random.random()*N
+        intervals.append(interval(n1,n2))
+
+    tree = interval_tree(intervals)
+    for i in xrange(10):
+        n1, n2 = random.random()*N, random.random()*N
+        tree.search(min(n1,n2), max(n1,n2))
+
+def main():
+    basic_test()
+
+if __name__=="__main__":
+    main()
