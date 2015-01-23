@@ -13,4 +13,12 @@ def test_correlation():
     n, l, d, rho, N = 1000, 1, 2, 0.1, 100
     ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N)
     Gamma = create_correlation_matrix(rho=rho, ys=ys, eps=0.1)
+    
+def test_positive_edges():
+    np.random.seed(42)
+
+    n, l, d, rho, N = 1000, 1, 2, 0.1, 100
+    ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N)
+    C = create_correlation_matrix(rho=rho, ys=ys, eps=0.1)
+    G = find_positive_edges(d=d, C=C)
     pdb.set_trace()

@@ -3,7 +3,7 @@ import scipy as sp
 
 from model import *
 
-__all__ = ['generate_data', 'generate_network_and_data', 'generate_uniform_sparse_hs']
+#__all__ = ['generate_data', 'generate_network_and_data', 'generate_uniform_sparse_hs']
 
 def generate_uniform_sparse_hs(n, rho, N):
     hs = []
