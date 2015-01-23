@@ -35,7 +35,7 @@ def find_positive_edges(d, C):
                 if not v == u:
                     Sv = set(np.where(C[v,:] > 0)[0].tolist())
                     S = list(Su.intersection(Sv))
-                    if len(S) < 1.3*d:
+                    if len(S) < 1.3*d + 1:
                         #print 'found common cause'
                         # create a parent to explain the cause
                         #print 'S:', list(S)
@@ -46,3 +46,15 @@ def find_positive_edges(d, C):
                         break
     return G
     
+
+def regenerate_hidden_layer(d, G, ys):
+    N = len(ys)
+    n,_ = ys[0].shape
+    hs = []
+    Gt = G.T
+    for i in xrange(N):
+        hc = Gt.dot(ys[i]) - 0.3*d
+        h =  np.ones((n,1))
+        h[hc < 0] = 0
+        hs.append(h)
+    return hs
