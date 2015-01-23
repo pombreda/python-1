@@ -12,11 +12,7 @@ def create_correlation_matrix(rho, ys, eps):
 
     Gamma = np.zeros((n,n))
     for i in xrange(N):
-        mat = ys[i].dot(ys[i].T)
-
-        # threshold low correlations
-        #mat[np.abs(mat) < eps] = 0    
-        Gamma += mat
+        Gamma += ys[i].dot(ys[i].T)
     
     C = np.ones((n,n))
     C[Gamma < rho*N/3.] = 0
@@ -58,3 +54,49 @@ def regenerate_hidden_layer(d, G, ys):
         h[hc < 0] = 0
         hs.append(h)
     return hs
+
+def find_negative_edges(hsp, ys, G):
+    N = len(ys)
+    n,_ = ys[0].shape
+    R = -1*np.ones((n,n))
+    R += G
+    #pdb.set_trace()
+    backedges = [set((np.nonzero(G[i,:])[0]).tolist()) for i in xrange(n)]
+    
+    for h,y in zip(hsp, ys):
+        ones_in_y, _ = np.nonzero(y)
+        supph = set(np.nonzero(h)[0].tolist())
+        for u in ones_in_y:
+            if len(supph.intersection(backedges[u])) == 1:
+                R[u,list(supph)] = 0
+    return R
+
+#def learn_real_weights(hsp, ys):
+
+
+def learn_network(n, l, d, rho, ys):
+    ysc = ys
+    hs = None
+    Gs = []
+    for i in xrange(l):
+        rhoi = rho*(d/2.)**(l- (i+1))
+        C = create_correlation_matrix(rho=rhoi, ys=ysc, eps=1e-3)
+        G = find_positive_edges(d=d, C=C)
+        hsp = regenerate_hidden_layer(d, G, ysc)
+        R = find_negative_edges(hsp, ysc, G)
+        #pdb.set_trace()
+        G += R
+        Gs.append(G)
+
+        ysc = hsp
+        hs = hsp
+    return Gs, hs
+
+def compute_error(hs, ys, hsp, ysp):
+    N = len(hs)
+    ey, eh = 0, 0
+    for i in xrange(N):
+        ey += np.linalg.norm(ys[i] - ysp[i], 1)
+        eh += np.linalg.norm(hs[i] - hsp[i], 1)
+    print 'avg. ey: ', ey/float(N)
+    print 'avg. eh: ', eh/float(N)

@@ -5,10 +5,12 @@ from model import *
 
 #__all__ = ['generate_data', 'generate_network_and_data', 'generate_uniform_sparse_hs']
 
+
 def generate_uniform_sparse_hs(n, rho, N):
     hs = []
     while len(hs) < N:
-        h = (sp.sign(rho - np.random.random((n,1))) + 1)/2.
+        rho_curr = min(1, (np.random.random() + 0.7))*rho
+        h = (sp.sign(rho_curr - np.random.random((n,1))) + 1)/2.
         if sum(h):
             hs.append(h)
     return hs

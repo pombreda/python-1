@@ -14,25 +14,18 @@ def test_correlation():
     ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N)
     Gamma = create_correlation_matrix(rho=rho, ys=ys, eps=0.1)
 
-def test_positive_edges():
+def test_with_uniform_data():
     np.random.seed(42)
 
-    n, l, d, rho, N = 100, 1, 2, 0.01, 5000
+    n, l, d, rho, N = 500, 1, 5, 0.01, 100000
     ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N)
-    C = create_correlation_matrix(rho=rho, ys=ys, eps=1e-3)
-    G = find_positive_edges(d=d, C=C)
 
-    hsp = regenerate_hidden_layer(d, G, ys)
+
+    Gsp, hsp = learn_network(n,l,d,rho,ys)
+    
     # regenerate data
-    ysp =  generate_data(hsp, [G])
+    ysp =  generate_data(hsp, Gsp)
 
-    erry = 0
-    for i in xrange(N):
-        erry += np.linalg.norm(ys[i] - ysp[i], 1)
-    print 'avg. erry: ', erry/float(N)
+    compute_error(hs, ys, hsp, ysp)
 
-    errh = 0
-    for i in xrange(N):
-        errh += np.linalg.norm(hs[i] - hsp[i], 1)
-    print 'avg. errh: ', errh/float(N)
     #pdb.set_trace()
