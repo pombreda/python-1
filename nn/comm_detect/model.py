@@ -4,6 +4,11 @@ import pdb
 
 #__all__ = ['create_real_G', 'create_signed_G', 'create_real_nn', 'create_signed_nn']
 
+def threshold(A):
+    A[A < 0] = 0
+    A[A > 0] = 1
+    return A
+
 def create_real_G(n, d):
     p = d/float(n)
     G1 = 2*(np.random.random((n,n)) - 0.5)

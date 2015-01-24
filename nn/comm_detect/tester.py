@@ -50,19 +50,20 @@ def test_with_uniform_data():
         print 'test error: %.4f' % compute_error(hst, yst, hstp, ystp)
 
 def test_denoising_autoencoder():
-    n, l, d, rho, N = 100, 1, 3, 0.02, 1000
+    n, l, d, rho, N = 100, 1, 3, 0.02, 10
     ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N, \
         which_distribution='uniform')
     print 'Finished generating data'
 
     hsp = encoder(d, Gs, ys)
     ysp = decoder(hsp, Gs)
+    #pdb.set_trace()
     print 'autoencoder error: %.4f' % (compute_error(hs, ys, hsp, ysp))
 
 def main():
     np.random.seed(42)
-    test_with_uniform_data()
-    #test_denoising_autoencoder()
+    #test_with_uniform_data()
+    test_denoising_autoencoder()
 
 if __name__=='__main__':
     main()

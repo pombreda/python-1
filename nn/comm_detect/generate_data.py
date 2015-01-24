@@ -7,7 +7,8 @@ from model import *
 def generate_uniform_sparse_hs(n, rho, N):
     hs = []
     while len(hs) < N:
-        rho_curr = min(1, (np.random.random() + 0.7))*rho
+        #rho_curr = min(1, (np.random.random() + 0.7))*rho
+        rho_curr = rho
         h = (sp.sign(rho_curr - np.random.random((n,1))) + 1)/2.
         if sum(h):
             hs.append(h)

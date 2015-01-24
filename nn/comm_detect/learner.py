@@ -105,6 +105,9 @@ def compute_error(hs, ys, hsp, ysp):
     N = len(hs)
     ey, eh = 0, 0
     for i in xrange(N):
+        print sum(hs[i]), sum(hsp[i]), np.linalg.norm(hs[i] - hsp[i], 1)
+        print sum(ys[i]), sum(ysp[i]), np.linalg.norm(ys[i] - ysp[i], 1)
+        print
         ey += np.linalg.norm(ys[i] - ysp[i], 1)
         eh += np.linalg.norm(hs[i] - hsp[i], 1)
     return ey/float(N)
