@@ -76,7 +76,7 @@ def find_negative_edges(hsp, ys, G):
 
 
 def learn_network(n, l, d, rho, ys):
-    ysc = ys.copy()
+    ysc = ys
     hs = None
     Gs = []
     for i in xrange(l):

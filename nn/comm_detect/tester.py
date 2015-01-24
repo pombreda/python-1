@@ -27,13 +27,14 @@ def check_statistis(hs, ys, hsp, ysp):
 
 def test_with_uniform_data():
 
-    n, l, d, rho, N = 200, 2, 3, 0.02, 10000
+    n, l, d, rho = 200, 1, 3, 0.02
+    N = int(10*np.log(n)/rho)
     ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N, \
         which_distribution='dirichlet')
     yst, hst = generate_test_data(Gs, rho, N/2, which_distribution='dirichlet')
     print 'Finished generating data'
 
-    l, d, rho = 2, 3, 0.04
+    l, d, rho = 1, 3, 0.04
     for d in np.arange(2, 17, 2):
         Gsp, hsp = learn_network(n,l,d,rho,ys)
         
@@ -60,8 +61,8 @@ def test_denoising_autoencoder():
 
 def main():
     np.random.seed(42)
-    #test_with_uniform_data()
-    test_denoising_autoencoder()
+    test_with_uniform_data()
+    #test_denoising_autoencoder()
 
 if __name__=='__main__':
     main()
