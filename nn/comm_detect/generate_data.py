@@ -1,10 +1,8 @@
 import numpy as np
 import scipy as sp
+import pdb
 
 from model import *
-
-#__all__ = ['generate_data', 'generate_network_and_data', 'generate_uniform_sparse_hs']
-
 
 def generate_uniform_sparse_hs(n, rho, N):
     hs = []
@@ -15,7 +13,7 @@ def generate_uniform_sparse_hs(n, rho, N):
             hs.append(h)
     return hs
 
-def generate_data(hs, Gs):
+def decoder(hs, Gs):
     '''
     Gs = l layers of a neural network, arranged as
     G1, G2, ..., Gl
@@ -39,5 +37,12 @@ def generate_data(hs, Gs):
 def generate_network_and_data(n, l, d, rho, N):
     Gs = create_signed_nn(n, l, d)
     hs = generate_uniform_sparse_hs(n, rho, N)
-    ys = generate_data(hs, Gs)
+    ys = decoder(hs, Gs)
     return ys, hs, Gs
+
+def generate_test_data(Gs, rho, N):
+    n,m = Gs[0].shape
+    assert n == m
+    hst = generate_uniform_sparse_hs(n, rho, N)
+    yst = decoder(hst, Gs)
+    return yst, hst

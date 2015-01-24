@@ -43,9 +43,10 @@ def find_positive_edges(d, C):
     return G
     
 
-def regenerate_hidden_layer(d, G, ys):
+def encode_one(d, G, ys):
     N = len(ys)
-    n,_ = ys[0].shape
+    #pdb.set_trace()
+    n,m = ys[0].shape
     hs = []
     Gt = G.T
     for i in xrange(N):
@@ -82,7 +83,7 @@ def learn_network(n, l, d, rho, ys):
         rhoi = rho*(d/2.)**(l- (i+1))
         C = create_correlation_matrix(rho=rhoi, ys=ysc, eps=1e-3)
         G = find_positive_edges(d=d, C=C)
-        hsp = regenerate_hidden_layer(d, G, ysc)
+        hsp = encode_one(d, G, ysc)
         R = find_negative_edges(hsp, ysc, G)
         #pdb.set_trace()
         G += R
@@ -92,11 +93,19 @@ def learn_network(n, l, d, rho, ys):
         hs = hsp
     return Gs, hs
 
+def encoder(d, Gs, ys):
+    l = len(Gs)
+    ysc = ys
+    for i in xrange(l):
+        hsc = encode_one(d, Gs[i], ysc)
+        ysc = hsc
+    return ysc
+
 def compute_error(hs, ys, hsp, ysp):
     N = len(hs)
     ey, eh = 0, 0
     for i in xrange(N):
         ey += np.linalg.norm(ys[i] - ysp[i], 1)
         eh += np.linalg.norm(hs[i] - hsp[i], 1)
-    print 'avg. ey: ', ey/float(N)
-    print 'avg. eh: ', eh/float(N)
+    return eh/float(N)
+    #print 'avg. eh: ', eh/float(N)
