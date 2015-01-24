@@ -26,15 +26,15 @@ def check_statistis(hs, ys, hsp, ysp):
 '''
 
 def test_with_uniform_data():
-    np.random.seed(42)
 
     n, l, d, rho, N = 200, 2, 3, 0.02, 10000
-    ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N)
-    yst, hst = generate_test_data(Gs, rho, N)
+    ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N, \
+        which_distribution='dirichlet')
+    yst, hst = generate_test_data(Gs, rho, N/2, which_distribution='dirichlet')
     print 'Finished generating data'
 
     l, d, rho = 2, 3, 0.04
-    for d in np.arange(2, 12, 2):
+    for d in np.arange(2, 17, 2):
         Gsp, hsp = learn_network(n,l,d,rho,ys)
         
         # regenerate training data
@@ -48,8 +48,20 @@ def test_with_uniform_data():
         print 'training error: %.4f' % (compute_error(hs, ys, hsp, ysp))
         print 'test error: %.4f' % compute_error(hst, yst, hstp, ystp)
 
+def test_denoising_autoencoder():
+    n, l, d, rho, N = 100, 1, 3, 0.02, 1000
+    ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N, \
+        which_distribution='uniform')
+    print 'Finished generating data'
+
+    hsp = encoder(d, Gs, ys)
+    ysp = decoder(hsp, Gs)
+    print 'autoencoder error: %.4f' % (compute_error(hs, ys, hsp, ysp))
+
 def main():
-    test_with_uniform_data()
+    np.random.seed(42)
+    #test_with_uniform_data()
+    test_denoising_autoencoder()
 
 if __name__=='__main__':
     main()

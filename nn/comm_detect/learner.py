@@ -76,7 +76,7 @@ def find_negative_edges(hsp, ys, G):
 
 
 def learn_network(n, l, d, rho, ys):
-    ysc = ys
+    ysc = ys.copy()
     hs = None
     Gs = []
     for i in xrange(l):
@@ -107,5 +107,5 @@ def compute_error(hs, ys, hsp, ysp):
     for i in xrange(N):
         ey += np.linalg.norm(ys[i] - ysp[i], 1)
         eh += np.linalg.norm(hs[i] - hsp[i], 1)
-    return eh/float(N)
+    return ey/float(N)
     #print 'avg. eh: ', eh/float(N)

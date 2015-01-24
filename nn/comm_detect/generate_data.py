@@ -13,6 +13,18 @@ def generate_uniform_sparse_hs(n, rho, N):
             hs.append(h)
     return hs
 
+def generate_dirichlet_sparse_hs(n, rho, N):
+    hs = []
+    alpha = [0.2 for i in xrange(n)]
+    hs1 = np.random.dirichlet(alpha, N).T
+    #pdb.set_trace()
+    for i in xrange(N):
+        h = hs1[:,i].reshape((n,1))
+        p = np.percentile(h, rho*100)
+        h[h > p] = 0
+        hs.append(np.sign(h))
+    return hs  
+
 def decoder(hs, Gs):
     '''
     Gs = l layers of a neural network, arranged as
@@ -26,7 +38,7 @@ def decoder(hs, Gs):
     ys = []
     assert n == m
     for Ni in xrange(N):
-        h = hs[Ni]
+        h = hs[Ni].copy()
         for li in reversed(range(l)):
             G = Gs[li]
             h = np.sign(np.clip(G.dot(h), 0, 1))
@@ -34,15 +46,25 @@ def decoder(hs, Gs):
 
     return ys
 
-def generate_network_and_data(n, l, d, rho, N):
+def generate_network_and_data(n, l, d, rho, N, which_distribution='uniform'):
     Gs = create_signed_nn(n, l, d)
-    hs = generate_uniform_sparse_hs(n, rho, N)
+    if which_distribution == 'uniform':
+        hs = generate_uniform_sparse_hs(n, rho, N)
+    elif which_distribution == 'dirichlet':
+        hs = generate_dirichlet_sparse_hs(n, rho, N)
+    else:
+        raise 'which_distribution not defined'
     ys = decoder(hs, Gs)
     return ys, hs, Gs
 
-def generate_test_data(Gs, rho, N):
+def generate_test_data(Gs, rho, N, which_distribution='uniform'):
     n,m = Gs[0].shape
     assert n == m
-    hst = generate_uniform_sparse_hs(n, rho, N)
+    if which_distribution == 'uniform':
+        hst = generate_uniform_sparse_hs(n, rho, N)
+    elif which_distribution == 'dirichlet':
+        hst = generate_dirichlet_sparse_hs(n, rho, N)
+    else:
+        raise 'which_distribution not defined'
     yst = decoder(hst, Gs)
     return yst, hst
