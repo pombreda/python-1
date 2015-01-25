@@ -6,35 +6,22 @@ from model import *
 from generate_data import *
 from learner import *
 
-def test_nn():
-    generate_network_and_data(n=10, l=5, d=5, rho=0.2, N=1)
-
 def test_correlation():
     n, l, d, rho, N = 1000, 1, 2, 0.1, 100
     ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N)
     Gamma = create_correlation_matrix(rho=rho, ys=ys, eps=0.1)
 
-'''
-def check_statistis(hs, ys, hsp, ysp):
-    compute_error(hs, ys, hsp, ysp)
-    N = len(hs)
-    hsparsity, ysparsity = 0,0
-    for i in xrange(N):
-        hsparsity += sum(hs[i])
-        ysparsity += sum(ys[i])
-    print ysparsity/float(N), hsparsity/float(N)
-'''
 
 def test_with_uniform_data():
 
-    n, l, d, rho = 200, 1, 3, 0.02
+    n, l, d, rho = 200, 1, 20, 0.02
     N = int(10*np.log(n)/rho)
     ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N, \
         which_distribution='dirichlet')
     yst, hst = generate_test_data(Gs, rho, N/2, which_distribution='dirichlet')
     print 'Finished generating data'
 
-    l, d, rho = 1, 3, 0.04
+    l, d, rho = 1, 22, 0.04
     for d in np.arange(2, 17, 2):
         Gsp, hsp = learn_network(n,l,d,rho,ys)
         
@@ -50,7 +37,16 @@ def test_with_uniform_data():
         print 'test error: %.4f' % compute_error(hst, yst, hstp, ystp)
 
 def test_denoising_autoencoder():
-    n, l, d, rho, N = 100, 1, 3, 0.02, 10
+    '''
+    n = 1000
+    l = 1
+    d = int(np.ceil(n**(0.15)))
+    rho = 0.1*(2./float(d))**l
+    N = 10*int(np.log(n)/rho**2)
+    '''
+    n, l, d, rho, N = 100, 1, 2, 0.1, 100
+    print n, l, d, rho, N
+    raw_input()
     ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N, \
         which_distribution='uniform')
     print 'Finished generating data'

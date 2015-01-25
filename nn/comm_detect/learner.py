@@ -43,19 +43,6 @@ def find_positive_edges(d, C):
     return G
     
 
-def encode_one(d, G, ys):
-    N = len(ys)
-    #pdb.set_trace()
-    n,m = ys[0].shape
-    hs = []
-    Gt = G.T
-    for i in xrange(N):
-        hc = Gt.dot(ys[i]) - 0.3*d
-        h =  np.ones((n,1))
-        h[hc < 0] = 0
-        hs.append(h)
-    return hs
-
 def find_negative_edges(hsp, ys, G):
     N = len(ys)
     n,_ = ys[0].shape
@@ -93,6 +80,17 @@ def learn_network(n, l, d, rho, ys):
         hs = hsp
     return Gs, hs
 
+def encode_one(d, G, ys):
+    N = len(ys)
+    #pdb.set_trace()
+    n,m = ys[0].shape
+    hs = []
+    Gt = G.T
+    for i in xrange(N):
+        h = threshold(Gt.dot(ys[i]) - 0.3*d)
+        hs.append(h)
+    return hs
+
 def encoder(d, Gs, ys):
     l = len(Gs)
     ysc = ys
@@ -101,14 +99,37 @@ def encoder(d, Gs, ys):
         ysc = hsc
     return ysc
 
+def decoder(hs, Gs):
+    '''
+    Gs = l layers of a neural network, arranged as
+    G1, G2, ..., Gl
+    hs = list of N vectors of length n
+    returns ys that are outputs of the network
+    '''
+    l = len(Gs)
+    n, m = Gs[0].shape
+    N = len(hs)
+    ys = []
+    assert n == m
+    for Ni in xrange(N):
+        y = hs[Ni].copy()
+        for li in reversed(range(l)):
+            G = Gs[li]
+            #h = np.sign(np.clip(G.dot(h), 0, 1))
+            y = threshold(G.dot(y))
+        ys.append(y)
+
+    return ys
+
+
 def compute_error(hs, ys, hsp, ysp):
     N = len(hs)
     ey, eh = 0, 0
     for i in xrange(N):
         print sum(hs[i]), sum(hsp[i]), np.linalg.norm(hs[i] - hsp[i], 1)
         print sum(ys[i]), sum(ysp[i]), np.linalg.norm(ys[i] - ysp[i], 1)
-        print
-        ey += np.linalg.norm(ys[i] - ysp[i], 1)
-        eh += np.linalg.norm(hs[i] - hsp[i], 1)
+        #print
+        ey += (not np.all(ys[i] - ysp[i] == 0))
+        eh += (not np.all(hs[i] - hsp[i] == 0))
     return ey/float(N)
     #print 'avg. eh: ', eh/float(N)

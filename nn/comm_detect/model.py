@@ -12,9 +12,9 @@ def threshold(A):
 def create_real_G(n, d):
     p = d/float(n)
     G1 = 2*(np.random.random((n,n)) - 0.5)
-    G2 = (sp.sign(p - np.random.random((n,n))) + 1)/2
-    
-    G = np.where(G2 > 0, G1, np.zeros((n,n)))
+    G2 = np.random.random((n,n)) < p
+    #pdb.set_trace()
+    G = G1*G2
     return G
 
 def create_signed_G(n, d):
