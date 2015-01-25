@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 import pdb
+from multiprocessing import Pool
 
 from model import *
 from generate_data import *
@@ -8,12 +9,7 @@ from generate_data import *
 
 def create_correlation_matrix(rho, Y):
     N, n = Y.shape
-
-    C = np.zeros((n,n))
-    for i in xrange(N):
-        yt = np.atleast_2d(Y[i,:])
-        C += (yt.T).dot(yt)
-
+    C = Y.T.dot(Y)
     C = C*(C > rho*N/3.)
     return C
 
@@ -108,6 +104,6 @@ def error(Y, Yp):
     #pdb.set_trace()
     #dY  = threshold(np.sum(np.abs(Y - Yp), axis=1))
     #return np.sum(dY)/float(N)
-    return np.linalg.norm(Y-Yp, 'fro')/float(N)
+    return np.linalg.norm(Y-Yp, 'fro')/float(N)*100
     
         

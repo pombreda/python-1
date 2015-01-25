@@ -12,6 +12,11 @@ def generate_nn_data(n, l, d, rho, N):
     Y = decoder(G, H)
     return G, H, Y
 
+def generate_nn_test_data(n, l, d, rho, G, N):
+    H = generate_Y(n, 0, d, rho, N)
+    Y = decoder(G, H)
+    return None, H, Y
+
 def generate_Y(n, l, d, rho, N):
     rhoy = rho*(d/2.)**l
     if rhoy > 0.1:
@@ -24,3 +29,8 @@ def generate_Y(n, l, d, rho, N):
     
     Y = Y[~mask]
     return Y[0:N,:]
+
+def estimate_rho(l, d, Y):
+    N, n = Y.shape
+    rhoy = np.sum(Y)/float(n*N)
+    return rhoy*(2./float(d))**l
