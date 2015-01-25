@@ -8,15 +8,15 @@ from learner import *
 
 
 def test_denoising_autoencoder():    
-    '''   
+    
     n = 1000
-    l = 1
+    l = 5
     d = int(np.ceil(n**(0.15)))
     rho = 0.01
-    N = 5*int(np.log(n)/rho)
-    '''
+    N = 10*int(np.log(n)/rho)
+    
 
-    n, l, d, rho, N = 50, 1, 2, 0.1, 120
+    #n, l, d, rho, N = 1000, 1, 2, 0.01, 1000
     print n, l, d, rho, N
     #pdb.set_trace()
 
