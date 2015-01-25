@@ -6,23 +6,21 @@ from model import *
 from generate_data import *
 
 
-def create_correlation_matrix(rho, ys, eps):
-    N = len(ys)
-    n = len(ys[0])
+def create_correlation_matrix(rho, Y, eps):
+    N, n = Y.shape
 
-    Gamma = np.zeros((n,n))
+    C = np.zeros((n,n))
     for i in xrange(N):
-        Gamma += ys[i].dot(ys[i].T)
-    
-    C = np.ones((n,n))
-    C[Gamma < rho*N/3.] = 0
+        yt = np.atleast_2d(Y[i,:])
+        C += (yt.T).dot(y)
+
+    C = C*(C > rho*N/3.)
     return C
 
 def find_positive_edges(d, C):
     n, _ = C.shape
     G = np.zeros((n,n))
     hcounter = 0
-    #pdb.set_trace()
     for u in xrange(n):
         if C[u,u] > 0:
             # FIX: where [0] because where returns a tuple
@@ -43,24 +41,20 @@ def find_positive_edges(d, C):
     return G
     
 
-def find_negative_edges(hsp, ys, G):
-    N = len(ys)
-    n,_ = ys[0].shape
+def find_negative_edges(hsp, Y, G):
+    N, n = Y.shape
     R = -1*np.ones((n,n))
     R += G
     #pdb.set_trace()
     backedges = [set((np.nonzero(G[i,:])[0]).tolist()) for i in xrange(n)]
     
-    for h,y in zip(hsp, ys):
+    for h, y in zip(hsp, Y):
         ones_in_y, _ = np.nonzero(y)
         supph = set(np.nonzero(h)[0].tolist())
         for u in ones_in_y:
             if len(supph.intersection(backedges[u])) == 1:
                 R[u,list(supph)] = 0
     return R
-
-#def learn_real_weights(hsp, ys):
-
 
 def learn_network(n, l, d, rho, ys):
     ysc = ys
@@ -78,7 +72,7 @@ def learn_network(n, l, d, rho, ys):
 
         ysc = hsp
         hs = hsp
-    return Gs, hs
+    return np.array(Gs), hs
 
 def encode_one(d, G, ys):
     N = len(ys)

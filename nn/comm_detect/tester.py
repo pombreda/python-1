@@ -6,35 +6,6 @@ from model import *
 from generate_data import *
 from learner import *
 
-def test_correlation():
-    n, l, d, rho, N = 1000, 1, 2, 0.1, 100
-    ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N)
-    Gamma = create_correlation_matrix(rho=rho, ys=ys, eps=0.1)
-
-
-def test_with_uniform_data():
-
-    n, l, d, rho = 200, 1, 20, 0.02
-    N = int(10*np.log(n)/rho)
-    ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N, \
-        which_distribution='dirichlet')
-    yst, hst = generate_test_data(Gs, rho, N/2, which_distribution='dirichlet')
-    print 'Finished generating data'
-
-    l, d, rho = 1, 22, 0.04
-    for d in np.arange(2, 17, 2):
-        Gsp, hsp = learn_network(n,l,d,rho,ys)
-        
-        # regenerate training data
-        ysp =  decoder(hsp, Gsp)
-        
-        # regenerate test data
-        hstp = encoder(d, Gsp, yst)
-        ystp =  decoder(hstp, Gsp)
-
-        print 'd: ', d
-        print 'training error: %.4f' % (compute_error(hs, ys, hsp, ysp))
-        print 'test error: %.4f' % compute_error(hst, yst, hstp, ystp)
 
 def test_denoising_autoencoder():
     '''
@@ -47,11 +18,11 @@ def test_denoising_autoencoder():
     n, l, d, rho, N = 100, 1, 2, 0.1, 100
     print n, l, d, rho, N
     raw_input()
-    ys, hs, Gs = generate_network_and_data(n=n, l=l, d=d, rho=rho, N=N, \
-        which_distribution='uniform')
-    print 'Finished generating data'
+    Y = generate_data(n, l, d, rho, N)
+    G = signed_nn(n, l, d)
+    pdb.set_trace()
 
-    hsp = encoder(d, Gs, ys)
+    hsp = encoder(d, G, Y)
     ysp = decoder(hsp, Gs)
     #pdb.set_trace()
     print 'autoencoder error: %.4f' % (compute_error(hs, ys, hsp, ysp))
