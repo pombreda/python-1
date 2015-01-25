@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+import scipy.sparse as sps
 import pdb
 
 def threshold(A):
@@ -8,12 +9,13 @@ def threshold(A):
     return A
 
 def real_sparse_matrix(n, d):
-    p = d/float(n)
-    G1 = 2*(np.random.random((n,n)) - 0.5)
-    G2 = np.random.random((n,n)) < p
-    #pdb.set_trace()
-    g = G1*G2
-    return g
+    xs = []
+    ys = []
+    for c in xrange(n):
+        xs += np.random.choice(range(0,n), d, replace=0).tolist()
+        ys += [c for i in xrange(d)]
+    vals = np.sign(np.random.rand(len(xs)) - 0.5)
+    return sps.coo_matrix((vals, (xs,ys)), shape=(n,n)).todense()
 
 def signed_sparse_matrix(n, d):
     G = real_sparse_matrix(n,d)

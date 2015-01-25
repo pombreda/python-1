@@ -12,7 +12,7 @@ def create_correlation_matrix(rho, Y):
     C = np.zeros((n,n))
     for i in xrange(N):
         yt = np.atleast_2d(Y[i,:])
-        C += (yt.T).dot(y)
+        C += (yt.T).dot(yt)
 
     C = C*(C > rho*N/3.)
     return C
@@ -41,38 +41,38 @@ def find_positive_edges(d, C):
     return G
     
 
-def find_negative_edges(H, Y, g):
+def find_negative_edges(H, Y, gplus):
     N, n = Y.shape
-    R = -1*np.ones((n,n))
-    R += g
+    gminus = -1*np.ones((n,n))
+    gminus += gplus
     #pdb.set_trace()
-    backedges = [set((np.nonzero(G[i,:])[0]).tolist()) for i in xrange(n)]
+    backedges = [set((np.nonzero(gplus[i,:])[0]).tolist()) for i in xrange(n)]
     
-    for h, y in zip(hsp, Y):
+    for h, y in zip(H, Y):
         ones_in_y, _ = np.nonzero(y)
         supph = set(np.nonzero(h)[0].tolist())
         for u in ones_in_y:
             if len(supph.intersection(backedges[u])) == 1:
-                R[u,list(supph)] = 0
-    return R
+                gminus[u,list(supph)] = 0
+    return gminus
 
-def learn_network(n, l, d, rho, Y):
+def learner(n, l, d, rho, Y):
     Yc = Y
     H = None
     G  = []
     for i in xrange(l):
         rhoi = rho*(d/2.)**(l- (i+1))
         C = create_correlation_matrix(rho=rhoi, Y=Yc)
-        G = find_positive_edges(d, C)
-        hsp = encode_one(d, G, ysc)
-        R = find_negative_edges(hsp, ysc, G)
+        gplus = find_positive_edges(d, C)
+        Hp = encode(d, gplus, Yc)
+        gminus = find_negative_edges(Hp, Yc, gplus)
         #pdb.set_trace()
-        G += R
-        Gs.append(G)
+        g = gplus + gminus
+        G.append(g)
 
-        ysc = hsp
-        hs = hsp
-    return np.array(Gs), hs
+        Yc = Hp
+        H = Hp
+    return np.array(G), H
 
 def encode(d, g, Y):
     N, n = Y.shape
