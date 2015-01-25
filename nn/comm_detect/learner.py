@@ -6,7 +6,7 @@ from model import *
 from generate_data import *
 
 
-def create_correlation_matrix(rho, Y, eps):
+def create_correlation_matrix(rho, Y):
     N, n = Y.shape
 
     C = np.zeros((n,n))
@@ -41,10 +41,10 @@ def find_positive_edges(d, C):
     return G
     
 
-def find_negative_edges(hsp, Y, G):
+def find_negative_edges(H, Y, g):
     N, n = Y.shape
     R = -1*np.ones((n,n))
-    R += G
+    R += g
     #pdb.set_trace()
     backedges = [set((np.nonzero(G[i,:])[0]).tolist()) for i in xrange(n)]
     
@@ -56,14 +56,14 @@ def find_negative_edges(hsp, Y, G):
                 R[u,list(supph)] = 0
     return R
 
-def learn_network(n, l, d, rho, ys):
-    ysc = ys
-    hs = None
-    Gs = []
+def learn_network(n, l, d, rho, Y):
+    Yc = Y
+    H = None
+    G  = []
     for i in xrange(l):
         rhoi = rho*(d/2.)**(l- (i+1))
-        C = create_correlation_matrix(rho=rhoi, ys=ysc, eps=1e-3)
-        G = find_positive_edges(d=d, C=C)
+        C = create_correlation_matrix(rho=rhoi, Y=Yc)
+        G = find_positive_edges(d, C)
         hsp = encode_one(d, G, ysc)
         R = find_negative_edges(hsp, ysc, G)
         #pdb.set_trace()
@@ -74,56 +74,36 @@ def learn_network(n, l, d, rho, ys):
         hs = hsp
     return np.array(Gs), hs
 
-def encode_one(d, G, ys):
-    N = len(ys)
+def encode(d, g, Y):
+    N, n = Y.shape
     #pdb.set_trace()
-    n,m = ys[0].shape
-    hs = []
-    Gt = G.T
-    for i in xrange(N):
-        h = threshold(Gt.dot(ys[i]) - 0.3*d)
-        hs.append(h)
-    return hs
+    H = g.T.dot(Y.T) - 0.3*d
+    return H.T
 
-def encoder(d, Gs, ys):
-    l = len(Gs)
-    ysc = ys
+def encoder(d, G, Y):
+    l,n,m = G.shape
+    Hc = Y
     for i in xrange(l):
-        hsc = encode_one(d, Gs[i], ysc)
-        ysc = hsc
-    return ysc
+        g = np.squeeze(G[i,:,:])
+        Hc = encode(d, g, Hc)
+    return Hc
 
-def decoder(hs, Gs):
-    '''
-    Gs = l layers of a neural network, arranged as
-    G1, G2, ..., Gl
-    hs = list of N vectors of length n
-    returns ys that are outputs of the network
-    '''
-    l = len(Gs)
-    n, m = Gs[0].shape
-    N = len(hs)
-    ys = []
-    assert n == m
-    for Ni in xrange(N):
-        y = hs[Ni].copy()
-        for li in reversed(range(l)):
-            G = Gs[li]
-            #h = np.sign(np.clip(G.dot(h), 0, 1))
-            y = threshold(G.dot(y))
-        ys.append(y)
+def decode(g, H):
+    return threshold(g.dot(H.T)).T
 
-    return ys
+def decoder(G, H):
+    l,n,m = G.shape
+    N, n = H.shape
 
+    Y = H
+    for li in reversed(range(l)):
+        g = np.squeeze(G[li,:,:])
+        Y = decode(g, Y)
+    return Y
 
-def compute_error(hs, ys, hsp, ysp):
-    N = len(hs)
-    ey, eh = 0, 0
-    for i in xrange(N):
-        print sum(hs[i]), sum(hsp[i]), np.linalg.norm(hs[i] - hsp[i], 1)
-        print sum(ys[i]), sum(ysp[i]), np.linalg.norm(ys[i] - ysp[i], 1)
-        #print
-        ey += (not np.all(ys[i] - ysp[i] == 0))
-        eh += (not np.all(hs[i] - hsp[i] == 0))
-    return ey/float(N)
-    #print 'avg. eh: ', eh/float(N)
+def error(Y, Yp):
+    N, n = Y.shape
+    pdb.set_trace()
+    dY  = threshold(np.sum(np.abs(Y - Yp), axis=1))
+    return np.sum(dY)/float(N)
+        
