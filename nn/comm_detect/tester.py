@@ -8,20 +8,20 @@ from learner import *
 
 
 def test_denoising_autoencoder():    
+    '''   
     n = 1000
     l = 1
     d = int(np.ceil(n**(0.15)))
     rho = 0.01
     N = 5*int(np.log(n)/rho)
-    
-    #n, l, d, rho, N = 10, 1, 4, 0.2, 10
+    '''
+
+    n, l, d, rho, N = 50, 1, 2, 0.1, 120
     print n, l, d, rho, N
-    raw_input()
+    #pdb.set_trace()
+
     G, H, Y = generate_nn_data(n, l, d, rho, N)
     
-    #G = learner(n,l,d,rho,Y)
-    #print 'Learned the network'
-
     Hp = encoder(d, G, Y)
     Yp = decoder(G, Hp)
     print 'autoencoder: avg. error %.4f' % (error(Y, Yp))

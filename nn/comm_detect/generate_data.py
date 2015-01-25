@@ -14,6 +14,8 @@ def generate_nn_data(n, l, d, rho, N):
 
 def generate_Y(n, l, d, rho, N):
     rhoy = rho*(d/2.)**l
+    if rhoy > 0.1:
+        print 'output is not sparse, rhoy=', rhoy
     Y = sps.rand(5*N, n, rhoy).todense()
     #pdb.set_trace()
     Y = threshold(Y)

@@ -75,9 +75,8 @@ def learner(n, l, d, rho, Y):
     return np.array(G), H
 
 def encode(d, g, Y):
-    N, n = Y.shape
-    #pdb.set_trace()
-    H = g.T.dot(Y.T) - 0.3*d
+    pdb.set_trace()
+    H = threshold((g.T).dot(Y.T) - 0.3*d)
     return H.T
 
 def encoder(d, G, Y):
@@ -103,7 +102,7 @@ def decoder(G, H):
 
 def error(Y, Yp):
     N, n = Y.shape
-    pdb.set_trace()
+    #pdb.set_trace()
     dY  = threshold(np.sum(np.abs(Y - Yp), axis=1))
     return np.sum(dY)/float(N)
         
