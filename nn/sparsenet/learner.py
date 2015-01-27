@@ -10,42 +10,55 @@ from generate_data import *
 def create_correlation_matrix(rho, Y):
     N, n = Y.shape
     C = Y.T.dot(Y)
-    C = threshold(C*(C > 2*np.log(n)/3.))
+    np.fill_diagonal(C, 0.1)
+    C = threshold(C*(C > 2*rho*N/3.))
     return C
 
 def get_siblings(C, s):
     return set(np.where(C[s,:] > 0)[0].tolist())    # all siblings of u, say v
 
-def find_positive_edges(d, _C):
-    C = _C
+def find_positive_edges(d, C):
+    E = C.copy()
     n, _ = C.shape
-    G = np.zeros((n,n))
+    gplus = np.zeros((n,n))
     hcounter = 0
     pdb.set_trace()
-    for u in xrange(n):
-        # FIX: where [0] because where returns a tuple
-        Su = get_siblings(C, u)
-        for v in Su:
-            if not v == u:
-                Sv = get_siblings(C, v)
-                S = Su.intersection(Sv)
-                if len(S) <= 1.3*d:
-                    Fhz = []
-                    for s in S:
-                        GammaS = get_siblings(C, s)
-                        if len(GammaS.intersection(S)) >= 0.8*d -1:
-                            Fhz.append(s)
-                    #print 'found common cause'
-                    # create a parent to explain the cause
-                    #print 'Fhz:', list(Fhz)
-                    lFhz = list(Fhz)
-                    G[lFhz, hcounter] = 1
-                    hcounter += 1
-                    # delete all correlations in Fhz
-                    C[lFhz, lFhz] = 0*C[lFhz, lFhz]
-                    break
-    print 'gplus is sparse?: ', np.sum(np.abs(G))
-    return G
+    
+    Er, Ec = np.nonzero(E)
+    while len(Er) > 0:
+        Eri = np.random.choice(len(Er))
+
+        v1 = Er[Eri]
+        v2 = Ec[Eri]
+        #print 'num edges: ', len(Er)
+        #pdb.set_trace()
+
+        Sv1 = get_siblings(C, v1)
+        Sv2 = get_siblings(C, v2)
+        S = Sv1.intersection(Sv2)
+        if (len(S) > 0) and (len(S) < 1.3*d):
+            Fhz = []
+            
+            #print 'reached inside'
+            for v in S:
+                Gammav = get_siblings(C, v)
+                if len(Gammav.intersection(S)) >= 0.8*d -1:
+                    Fhz.append(v)
+            
+            lFhz = list(Fhz)
+            #print 'lFhz', lFhz
+            if lFhz:
+                gplus[lFhz, hcounter] = 1
+                hcounter += 1
+                for v in lFhz:
+                    Er = Er[Er != v]
+                    Ec = Ec[Ec != v]
+                print 'added parents', len(Er)
+                if len(Er) == 4:
+                    pdb.set_trace()
+
+    print 'gplus is sparse?: ', np.sum(np.abs(gplus))
+    return gplus
     
 
 def find_negative_edges(H, Y, gplus):

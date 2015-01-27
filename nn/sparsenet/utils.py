@@ -1,6 +1,7 @@
 import numpy as np
 
 def threshold(A):
+    A = A.astype(int)
     A[A < 0] = 0
     A[A > 0] = 1
     return A
