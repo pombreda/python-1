@@ -9,12 +9,9 @@ import gzip
 from model import *
 from generate_data import *
 from learner import *
+from utils import *
 
 fname = 'data/uniform_sparse.pkl.gz'
-
-def feature_error(Y, Yp):
-    N, n = Y.shape
-    return np.linalg.norm(Y-Yp, 1)/float(N)
 
 
 def create_data():
@@ -53,7 +50,7 @@ def test_denoising_autoencoder():
 
     Hp = encoder(d, G, Y)
     Yp = decoder(G, Hp)
-    print 'autoencoder: avg. error %.4f' % (feature_error(Y, Yp))
+    print 'autoencoder: avg. error %.4f' % (l1_loss(Y, Yp))
 
 def test_leaner():
 
@@ -68,11 +65,11 @@ def test_leaner():
     print 'Learned the network'
 
     Yp = decoder(Gp, Hp)
-    print 'learner: training error %.4f' % (feature_error(Y, Yp))
+    print 'learner: training error %.4f' % (l1_loss(Y, Yp))
 
     Htp = encoder(d, Gp, Yt)
     Ytp = decoder(Gp, Htp)
-    print 'learner: test error %.4f' % (feature_error(Yt, Ytp))
+    print 'learner: test error %.4f' % (l1_loss(Yt, Ytp))
 
     '''
     # sanity check
@@ -82,13 +79,13 @@ def test_leaner():
     Gnewp, Hnewp = learner(n, l, d, rho, Ynew)
     print 'Learned the network with more data'
     Ynewp = decoder(Gnewp, Hnewp)
-    print 'learner: training error with more data %.4f' % (feature_error(Ynew, Ynewp))
+    print 'learner: training error with more data %.4f' % (l1_loss(Ynew, Ynewp))
     '''
 
 def main():
     np.random.seed(42)
-    #test_denoising_autoencoder()
-    test_leaner()
+    test_denoising_autoencoder()
+    #test_leaner()
 
 if __name__=='__main__':
     main()

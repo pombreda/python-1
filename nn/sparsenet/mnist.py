@@ -10,28 +10,22 @@ import gzip
 from model import *
 from generate_data import *
 from learner import *
+from utils import *
 
 fname = 'data/mnist.pkl.gz'
 
-
-def output_error(T, Tp):
-    return np.sum(threshold(np.abs(T - Tp)))/float(len(T))
-
-def feature_error(Y, Yp):
-    N, n = Y.shape
-    return np.linalg.norm(Y-Yp, 1)/float(N)
 
 def test_mnist():
     train_set, valid_set, test_set = generate_mnist(fname)
     Y, target = train_set
     Yt, targett = test_set
     #pdb.set_trace()
-    Y = np.concatenate((Y, 0*Y), axis=1)
-    Yt = np.concatenate((Yt, 0*Yt), axis=1)
+    #Y = np.concatenate((Y, 0*Y), axis=1)
+    #Yt = np.concatenate((Yt, 0*Yt), axis=1)
 
     N, n = Y.shape
-    l = 5
-    d = int(np.ceil(n**(0.15)))
+    l = 2
+    d = int(np.ceil(n**(0.19)))
     rho = estimate_rho(l, d, Y)
     #N = int(np.log(n)/rho**2)
     
@@ -49,17 +43,17 @@ def test_mnist():
     print 'Learned the network'
 
     Yp = decoder(Gp, Hp)
-    print 'NN training error: %.4f' % feature_error(Y, Yp)
+    print 'NN training error: %.4f' % l1_loss(Y, Yp)
     
     '''
     clf = svm.LinearSVC(loss='l2', penalty='l1', dual=False)
     clf.fit(Hp, target)
     targetp = clf.predict(Hp)
-    print 'training error: %.4f' % (output_error(target, targetp))
+    print 'training error: %.4f' % (zero_one_loss(target, targetp))
 
     Htp = encoder(d, Gp, Yt)
     targettp = clf.predict(Htp)
-    print 'test error: %.4f' % (output_error(targett, targettp))
+    print 'test error: %.4f' % (zero_one_loss(targett, targettp))
     '''
 def main():
     test_mnist()
