@@ -9,13 +9,13 @@ from model import *
 from learner import *
 
 def generate_nn_data(n, l, d, rho, N):
-    H = generate_sparse_Y(n, 0, d, rho, N)
+    H = generate_Y(n, 0, d, rho, N)
     G = signed_nn(n, l, d)
     Y = decoder(G, H)
     return G, H, Y
 
 def generate_nn_test_data(n, l, d, rho, G, N):
-    H = generate_sparse_Y(n, 0, d, rho, N)
+    H = generate_Y(n, 0, d, rho, N)
     Y = decoder(G, H)
     return None, H, Y
 
@@ -66,4 +66,7 @@ def generate_mnist(fname):
     with gzip.open(fname, 'rb') as fp:
         train_set, valid_set, test_set = pickle.load(fp)    
 
+    train_set = (threshold(train_set[0]), train_set[1])
+    test_set = (threshold(test_set[0]), test_set[1])
+    valid_set = (threshold(valid_set[0]), valid_set[1])
     return train_set, valid_set, test_set

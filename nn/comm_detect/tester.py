@@ -10,7 +10,7 @@ from model import *
 from generate_data import *
 from learner import *
 
-fname = 'tester.pkl.gz'
+fname = 'data/uniform_sparse.pkl.gz'
 
 def create_data():
     if not os.path.isfile(fname):

@@ -21,6 +21,7 @@ def test_mnist():
     train_set, valid_set, test_set = generate_mnist(fname)
     Y, target = train_set
     Yt, targett = test_set
+    #pdb.set_trace()
 
     N, n = Y.shape
     l = 1
