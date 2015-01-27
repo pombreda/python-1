@@ -104,6 +104,4 @@ def error(Y, Yp):
     #pdb.set_trace()
     #dY  = threshold(np.sum(np.abs(Y - Yp), axis=1))
     #return np.sum(dY)/float(N)
-    return np.linalg.norm(Y-Yp, 'fro')/float(N)*100
-    
-        
+    return np.linalg.norm(Y-Yp, 1)/float(N)

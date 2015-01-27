@@ -22,15 +22,14 @@ def test_mnist():
     Y, target = train_set
     Yt, targett = test_set
 
-    _, n = Y.shape
-    l = 4
+    N, n = Y.shape
+    l = 1
     d = int(np.ceil(n**(0.15)))
     rho = estimate_rho(l, d, Y)
-    N = int(np.log(n)/rho**2)
+    #N = int(np.log(n)/rho**2)
     
-    if N > Y.shape[0]:
-        print 'fewer samples than necessary, N: %.4f, Y: %.4f' %(N, Y.shape[0])
-        raw_input()
+    if N >= Y.shape[0]:
+        print 'samples N: %.d, Y: %.d' %(N, Y.shape[0])
     else:
         N = int(np.log(n)/rho**2)
         Y = Y[0:N,:]
@@ -42,11 +41,11 @@ def test_mnist():
     Gp, Hp = learner(n, l, d, rho, Y)
     print 'Learned the network'
 
-    N = 1000
-    Hp = Hp[:N,:]
-    target = target[:N]
-
-    clf = svm.SVC(kernel='linear')
+    Yp = decoder(Gp, Hp)
+    print 'NN training error: %.4f' % error(Y, Yp)
+    
+    '''
+    clf = svm.LinearSVC(loss='l2', penalty='l1', dual=False)
     clf.fit(Hp, target)
     targetp = clf.predict(Hp)
     print 'training error: %.4f' % (svmerr(target, targetp))
@@ -54,7 +53,7 @@ def test_mnist():
     Htp = encoder(d, Gp, Yt)
     targettp = clf.predict(Htp)
     print 'test error: %.4f' % (svmerr(targett, targettp))
-
+    '''
 def main():
     test_mnist()
 
