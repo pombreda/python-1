@@ -24,7 +24,7 @@ def test_mnist():
     #Yt = np.concatenate((Yt, 0*Yt), axis=1)
 
     N, n = Y.shape
-    l = 2
+    l = 4
     d = int(np.ceil(n**(0.19)))
     rho = estimate_rho(l, d, Y)
     #N = int(np.log(n)/rho**2)
@@ -45,16 +45,17 @@ def test_mnist():
     Yp = decoder(Gp, Hp)
     print 'NN training error: %.4f' % l1_loss(Y, Yp)
     
-    '''
-    clf = svm.LinearSVC(loss='l2', penalty='l1', dual=False)
-    clf.fit(Hp, target)
-    targetp = clf.predict(Hp)
-    print 'training error: %.4f' % (zero_one_loss(target, targetp))
+    if 1:
+        clf = svm.LinearSVC(loss='l2', penalty='l1', dual=False)
+        clf.fit(Hp, target)
+        targetp = clf.predict(Hp)
+        print 'training error: %.4f' % (zero_one_loss(target, targetp))
 
-    Htp = encoder(d, Gp, Yt)
-    targettp = clf.predict(Htp)
-    print 'test error: %.4f' % (zero_one_loss(targett, targettp))
-    '''
+        Htp = encoder(d, Gp, Yt)
+        targettp = clf.predict(Htp)
+        print 'test error: %.4f' % (zero_one_loss(targett, targettp))
+
+
 def main():
     test_mnist()
 

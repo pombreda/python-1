@@ -17,8 +17,8 @@ fname = 'data/uniform_sparse.pkl.gz'
 def create_data():
     if not os.path.isfile(fname):
         
-        n = 500
-        l = 3
+        n = 100
+        l = 1
         d = int(np.ceil(n**(0.15)))
         rho = 0.01
         N = int(np.log(n)/rho**2)
@@ -47,21 +47,26 @@ def test_denoising_autoencoder():
     
     training_data, test_data = create_data()
     G, H, Y, n, l, d, rho, N = training_data
+    pdb.set_trace()
 
     Hp = encoder(d, G, Y)
     Yp = decoder(G, Hp)
-    print 'autoencoder: avg. error %.4f' % (l1_loss(Y, Yp))
+    print 'autoencoder: dH %.4f' % (l1_loss(H, Hp))
+    print 'autoencoder: dY %.4f' % (l1_loss(Y, Yp))
 
 def test_leaner():
 
     training_data, test_data = create_data()
     G, H, Y, n, l, d, rho, N = training_data
     Gt, Ht, Yt, nt, lt, dt, rhot, Nt = test_data
-        
-    l = 4
+    
+    print n, l, d, rho, N
+    l = 1
     d = 3
     rho = estimate_rho(l, d, Y)
-    Gp, Hp = learner(n, l, d, rho, Y)
+    
+
+    Gp, Hp = learner(n, l, d, rho, Y, G, H)
     print 'Learned the network'
 
     Yp = decoder(Gp, Hp)
@@ -84,8 +89,8 @@ def test_leaner():
 
 def main():
     np.random.seed(42)
-    test_denoising_autoencoder()
-    #test_leaner()
+    #test_denoising_autoencoder()
+    test_leaner()
 
 if __name__=='__main__':
     main()

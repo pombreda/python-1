@@ -3,10 +3,7 @@ import scipy as sp
 import scipy.sparse as sps
 import pdb
 
-def threshold(A):
-    A[A < 0] = 0
-    A[A > 0] = 1
-    return A
+from utils import *
 
 def real_sparse_matrix(n, d):
     xs = []
