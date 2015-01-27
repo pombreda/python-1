@@ -13,18 +13,18 @@ def create_correlation_matrix(rho, Y):
     C = threshold(C*(C > 2*rho*N/3.))
     return C
 
-def get_siblings(C, s):
-    return set(np.where(C[s,:] > 0)[0].tolist())    # all siblings of u, say v
+def get_siblings(M, s):
+    siblings = set(np.where(M[s,:] > 0)[0].tolist())    # all siblings of u, say v
+    return siblings
 
-def find_positive_edges(d, C):
+def find_positive_edges(d, C, _G):
     E = C.copy()
     n, _ = C.shape
     gplus = np.zeros((n,n))
     hcounter = 0
-    pdb.set_trace()
     
-    Er, Ec = np.nonzero(E)
-    while len(Er) > 0:
+    while np.sum(E) > 1e-2:
+        Er, Ec = np.nonzero(E)
         Eri = np.random.choice(len(Er))
 
         v1 = Er[Eri]
@@ -35,7 +35,14 @@ def find_positive_edges(d, C):
         Sv1 = get_siblings(C, v1)
         Sv2 = get_siblings(C, v2)
         S = Sv1.intersection(Sv2)
-        if len(S) < 1.3*d:
+        if len(Er) > -25:
+            print v1, Sv1
+            print v2, Sv2
+            key = raw_input()
+            if key == 'd':
+                pdb.set_trace()
+
+        if (len(S) > 0) and (len(S) < 1.3*d):
             Fhz = []
             
             #print 'reached inside'
@@ -46,18 +53,13 @@ def find_positive_edges(d, C):
             
             lFhz = list(Fhz)
             #print 'lFhz', lFhz
-            if lFhz:
+            if len(lFhz):
                 gplus[lFhz, hcounter] = 1
                 hcounter += 1
                 for v in lFhz:
-                    Er = Er[Er != v]
-                    Ec = Ec[Er != v]
-                    
-                    Er = Er[Ec != v]
-                    Ec = Ec[Ec != v]
+                    E[lFhz, v] = 0
                 print 'added parents', len(Er)
-                if len(Er) == 4:
-                    pdb.set_trace()
+                
 
     print 'gplus is sparse?: ', np.sum(np.abs(gplus))
     return gplus
@@ -93,7 +95,7 @@ def learner(n, l, d, rho, Y, _G, _H):
     for i in xrange(l):
         rhoi = rho*(d/2.)**(l- (i+1))
         C = create_correlation_matrix(rho=rhoi, Y=Yc)
-        gplus = find_positive_edges(d, C)
+        gplus = find_positive_edges(d, C, _G=_G)
         Hp = encode(d, gplus, Yc)
         
         # diagnostics

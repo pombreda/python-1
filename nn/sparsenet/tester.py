@@ -23,7 +23,7 @@ def create_data():
         rho = 0.01
         N = int(np.log(n)/rho**2)
         
-        #n, l, d, rho, N = 1000, 1, 2, 0.01, 1000
+        #n, l, d, rho, N = 10, 1, 2, 0.2, 1000
         print n, l, d, rho, N
         #pdb.set_trace()
 
@@ -42,6 +42,16 @@ def create_data():
         print 'Loaded pickled data'
     return training_data, test_data
 
+def test_positive_edges():
+    C = np.array([
+        [1, 1, 1, 0, 1],
+        [1, 1, 1, 0, 0],
+        [1, 1, 1, 1, 1],
+        [0, 0, 1, 1, 1],
+        [1, 0, 1, 1, 1]
+        ])
+    d = 3
+    return find_positive_edges(d, C, np.zeros((5,5)))
 
 def test_denoising_autoencoder():    
     
@@ -89,8 +99,9 @@ def test_leaner():
 
 def main():
     np.random.seed(42)
+    test_positive_edges()
     #test_denoising_autoencoder()
-    test_leaner()
+    #test_leaner()
 
 if __name__=='__main__':
     main()
