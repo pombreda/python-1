@@ -98,10 +98,3 @@ def decoder(G, H):
         g = np.squeeze(G[li,:,:])
         Y = decode(g, Y)
     return Y
-
-def error(Y, Yp):
-    N, n = Y.shape
-    #pdb.set_trace()
-    #dY  = threshold(np.sum(np.abs(Y - Yp), axis=1))
-    #return np.sum(dY)/float(N)
-    return np.linalg.norm(Y-Yp, 1)/float(N)
