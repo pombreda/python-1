@@ -35,13 +35,14 @@ def find_positive_edges(d, C, _G):
         Sv1 = get_siblings(C, v1)
         Sv2 = get_siblings(C, v2)
         S = Sv1.intersection(Sv2)
+        '''
         if len(Er) > -25:
             print v1, Sv1
             print v2, Sv2
             key = raw_input()
             if key == 'd':
                 pdb.set_trace()
-
+        '''
         if (len(S) > 0) and (len(S) < 1.3*d):
             Fhz = []
             
@@ -58,7 +59,7 @@ def find_positive_edges(d, C, _G):
                 hcounter += 1
                 for v in lFhz:
                     E[lFhz, v] = 0
-                print 'added parents', len(Er)
+                #print 'added parents', len(Er)
                 
 
     print 'gplus is sparse?: ', np.sum(np.abs(gplus))

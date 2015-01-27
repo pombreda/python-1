@@ -51,7 +51,11 @@ def test_positive_edges():
         [1, 0, 1, 1, 1]
         ])
     d = 3
-    return find_positive_edges(d, C, np.zeros((5,5)))
+    gp = find_positive_edges(d, C, np.zeros((5,5)))
+    
+    res = 'The result should have 3 parents, i.e., three populated\n' + \
+    'columns in gp with children (0,1,2), (0,2,4), (2,3,4)\n'
+    print res, gp
 
 def test_denoising_autoencoder():    
     
@@ -99,9 +103,9 @@ def test_leaner():
 
 def main():
     np.random.seed(42)
-    test_positive_edges()
+    #test_positive_edges()
     #test_denoising_autoencoder()
-    #test_leaner()
+    test_leaner()
 
 if __name__=='__main__':
     main()
