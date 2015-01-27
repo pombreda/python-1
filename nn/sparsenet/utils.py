@@ -1,9 +1,9 @@
 import numpy as np
 
 def threshold(A):
-    A = A.astype(int)
     A[A < 0] = 0
     A[A > 0] = 1
+    A = A.astype(int)
     return A
 
 def zero_one_loss(Y, Yp):

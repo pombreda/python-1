@@ -23,7 +23,6 @@ def find_positive_edges(d, C):
     hcounter = 0
     pdb.set_trace()
     
-    np.fill_diagonal(E, 0)
     Er, Ec = np.nonzero(E)
     while len(Er) > 0:
         Eri = np.random.choice(len(Er))
@@ -36,7 +35,7 @@ def find_positive_edges(d, C):
         Sv1 = get_siblings(C, v1)
         Sv2 = get_siblings(C, v2)
         S = Sv1.intersection(Sv2)
-        if (len(S) > 0) and (len(S) < 1.3*d):
+        if len(S) < 1.3*d:
             Fhz = []
             
             #print 'reached inside'
