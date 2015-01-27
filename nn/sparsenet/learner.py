@@ -10,7 +10,6 @@ from generate_data import *
 def create_correlation_matrix(rho, Y):
     N, n = Y.shape
     C = Y.T.dot(Y)
-    np.fill_diagonal(C, 0.1)
     C = threshold(C*(C > 2*rho*N/3.))
     return C
 
@@ -24,6 +23,7 @@ def find_positive_edges(d, C):
     hcounter = 0
     pdb.set_trace()
     
+    np.fill_diagonal(E, 0)
     Er, Ec = np.nonzero(E)
     while len(Er) > 0:
         Eri = np.random.choice(len(Er))
@@ -52,6 +52,9 @@ def find_positive_edges(d, C):
                 hcounter += 1
                 for v in lFhz:
                     Er = Er[Er != v]
+                    Ec = Ec[Er != v]
+                    
+                    Er = Er[Ec != v]
                     Ec = Ec[Ec != v]
                 print 'added parents', len(Er)
                 if len(Er) == 4:
