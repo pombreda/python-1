@@ -2,6 +2,8 @@ import numpy as np
 import scipy as sp
 import scipy.sparse as sps
 import pdb
+import cPickle as pickle
+import gzip
 
 from model import *
 from learner import *
@@ -35,17 +37,33 @@ def estimate_rho(l, d, Y):
     rhoy = np.sum(Y)/float(n*N)
     return rhoy*(2./float(d))**l
 
+'''
 # static variables inside the function!
 def generate_sparse_Y(n,l,d,rho,N):
     if not (hasattr(generate_sparse_Y, "signal") or \
             hasattr(generate_sparse_Y, "m") or \
-            hasattr(generate_sparse_Y, "density")):
-        m = 10*n
+            hasattr(generate_sparse_Y, "density") or \
+            hasattr(generate_sparse_Y, "A")):
+        m = 5*n
         signal = np.random.random((m,1))
         density = 0.2
+        A = np.random.random((n,m))
     Y = []
+    rhoy = rho*(d/2.)**l
     for i in xrange(N):
-        A = sps.rand(n, m, density)
-        y = np.array(A.dot(signal)).T
-        Y.append(y)
+        M = np.random.random((n,m))
+        mask = M*(M < density)
+        pdb.set_trace()
+        B = mask*A
+        y = np.squeeze(np.array(B.dot(signal)))
+        y = y/np.sum(y)
+        Y.append(threshold(y))
     return np.array(Y)
+'''
+
+def generate_mnist(fname):
+    train_set, valid_set, test_set = None, None, None
+    with gzip.open(fname, 'rb') as fp:
+        train_set, valid_set, test_set = pickle.load(fp)    
+
+    return train_set, valid_set, test_set
