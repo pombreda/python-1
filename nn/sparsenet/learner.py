@@ -23,6 +23,7 @@ def find_positive_edges(d, C, _G):
     gplus = np.zeros((n,n))
     hcounter = 0
     
+    np.fill_diagonal(E, 0)
     while np.sum(E) > 1e-2:
         Er, Ec = np.nonzero(E)
         Eri = np.random.choice(len(Er))
