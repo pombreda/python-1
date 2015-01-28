@@ -79,7 +79,6 @@ def test_leaner():
     d = 3
     rho = estimate_rho(l, d, Y)
     
-
     Gp, Hp = learner(n, l, d, rho, Y, G, H)
     print 'Learned the network'
 
