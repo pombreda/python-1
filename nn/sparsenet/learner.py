@@ -78,8 +78,15 @@ def find_negative_edges(H, Y, gplus):
     for i in xrange(N):
         h = H[i,:]
         y = Y[i,:]
-        ones_in_y = np.nonzero(y)[0]
+        ones_in_y = np.nonzero(y)[0].tolist()
         supph = set(np.nonzero(h)[0].tolist())
+        
+        # diagnostics
+        print i, ones_in_y
+        print i, supph
+        key = raw_input()
+        if key == 'd':
+            pdb.set_trace()
 
         for u in ones_in_y:
             if len(supph.intersection(backedges[u])) == 1:
@@ -100,14 +107,15 @@ def learner(n, l, d, rho, Y, _G, _H):
         gplus = find_positive_edges(d, C, _G=_G)
         Hp = encode(d, gplus, Yc)
         
+        '''
         # diagnostics
         _Gplus = _G*(_G > 0)
         _Gmnius = _G*(_G < 0)
         _Hp = encode(d, _Gplus[0, :, :], Yc)
         pdb.set_trace()
-        
+        '''
+
         gminus = find_negative_edges(Hp, Yc, gplus)
-        
         g = gplus + gminus
         G.append(g)
 
@@ -117,7 +125,7 @@ def learner(n, l, d, rho, Y, _G, _H):
 
 def encode(d, g, Y):
     #pdb.set_trace()
-    H = threshold((g.T).dot(Y.T) - 0.2*d)
+    H = threshold((g.T).dot(Y.T) - 0.3*d)
     return H.T
 
 def encoder(d, G, Y):
