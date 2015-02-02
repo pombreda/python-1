@@ -108,13 +108,13 @@ def learner(n, l, d, rho, Y, _G, _H):
         gplus = find_positive_edges(d, C, _G=_G)
         Hp = encode(d, gplus, Yc)
         
-        '''
+        
         # diagnostics
         _Gplus = _G*(_G > 0)
         _Gmnius = _G*(_G < 0)
         _Hp = encode(d, _Gplus[0, :, :], Yc)
         pdb.set_trace()
-        '''
+        
 
         gminus = find_negative_edges(Hp, Yc, gplus)
         g = gplus + gminus
@@ -126,7 +126,7 @@ def learner(n, l, d, rho, Y, _G, _H):
 
 def encode(d, g, Y):
     #pdb.set_trace()
-    H = threshold(g.dot(Y.T) - 0.3*d)
+    H = threshold(g.T.dot(Y.T) - 0.3*d)
     return H.T
 
 def encoder(d, G, Y):
