@@ -83,7 +83,7 @@ def find_positive_edges(d, C, _G):
     while np.sum(E) > 0:
         Er, Ec = np.nonzero(E)
         Eri = np.random.choice(len(Er))
-        print 'current parents', len(Er)
+        #print 'current parents', len(Er)
         
         v1 = Er[Eri]
         v2 = Ec[Eri]
@@ -132,11 +132,11 @@ def find_positive_edges(d, C, _G):
 def find_negative_edges(H, Y, gplus):
     N, n = Y.shape
     gminus = -1*np.ones((n,n))
-    gminus += gplus
+    gminus[gplus > 0] = 0
     #pdb.set_trace()
     backedges = [set((np.nonzero(gplus[i,:])[0]).tolist()) for i in xrange(n)]
     
-    c = []
+    c = 0
     for i in xrange(N):
         h = H[i,:]
         y = Y[i,:]
@@ -154,9 +154,10 @@ def find_negative_edges(H, Y, gplus):
         for u in ones_in_y:
             if len(supph.intersection(backedges[u])) == 1:
                 gminus[u,list(supph)] = 0
-                c = c+ list(supph)
+                c += len(supph)
+                #print 'set these to zero', u, supph
 
-    print 'set %d entries in gminus to zero' %(len(set(c)))
+    print 'num entries to zero: ', c
     print 'gminus is sparse?: ', np.sum(np.abs(gminus))
     return gminus
 
@@ -174,7 +175,7 @@ def learner(n, l, d, rho, Y, _G, _H):
         _Gplus = _G*(_G > 0)
         _Gmnius = _G*(_G < 0)
         _Hp = encode(d, _Gplus[0, :, :], Yc)
-        pdb.set_trace()
+        #pdb.set_trace()
         
 
         gminus = find_negative_edges(Hp, Yc, gplus)

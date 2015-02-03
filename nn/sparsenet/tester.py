@@ -71,6 +71,20 @@ def test_leaner():
     print 'learner: training error with more data %.4f' % (l1_loss(Ynew, Ynewp))
     '''
 
+def test_unknown_data():
+    n = 100
+    l = 1
+    d = int(np.ceil(n**(0.15)))
+    rho = 0.01
+    N = int(np.log(n)/rho**2)
+
+    Y = generate_Y(n, l, d, rho, N)
+    Gp, Hp = learner(n, l, d, rho, Y, np.zeros((l, n,n)), np.zeros((N,n)))
+    print 'Learned the network'
+
+    Yp = decoder(Gp, Hp)
+    print 'learner: training error %.4f' % (l1_loss(Y, Yp))    
+
 def main():
     np.random.seed(42)
     #test_positive_edges()
