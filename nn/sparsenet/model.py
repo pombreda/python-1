@@ -5,6 +5,7 @@ import pdb
 
 from utils import *
 
+'''
 def real_sparse_matrix(n, d):
     xs = []
     ys = []
@@ -13,6 +14,15 @@ def real_sparse_matrix(n, d):
         ys += [c for i in xrange(d)]
     vals = np.sign(np.random.rand(len(xs)) - 0.5)
     return sps.coo_matrix((vals, (xs,ys)), shape=(n,n)).todense()
+'''
+
+def real_sparse_matrix(n, d):
+    p = float(d)/float(n)/2.
+    A = np.random.random((n,n))
+    B = A*(A < p)
+    C = A*(A > 1-p)
+    G = -np.sign(B) + np.sign(C)
+    return G
 
 def signed_sparse_matrix(n, d):
     G = real_sparse_matrix(n,d)
