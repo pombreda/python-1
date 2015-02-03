@@ -93,15 +93,15 @@ def find_positive_edges(d, C, _G):
         Sv1 = get_siblings(C, v1)
         Sv2 = get_siblings(C, v2)
         S = Sv1.intersection(Sv2)
-        
+        '''
         if len(Er) > -25:
             print v1, Sv1
             print v2, Sv2
             key = raw_input()
             if key == 'd':
                 pdb.set_trace()
-        
-        if (len(S) > 0) and (len(S) <= 1.5*d):
+        '''
+        if (len(S) > 0) and (len(S) <= 1.5*d + 1):
             Fhz = []
             #print 'reached inside'
             for v in S:
