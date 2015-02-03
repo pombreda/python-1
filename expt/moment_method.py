@@ -2,7 +2,7 @@ import numpy as np
 
 m = 500     # y = mx1
 n = 100     # x = nx1
-N = 500000    # num-samples
+N = 10000   # num-samples
 
 # Y = AX
 # Y = mxN, X = nxN

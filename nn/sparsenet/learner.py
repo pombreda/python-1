@@ -7,15 +7,69 @@ from model import *
 from generate_data import *
 
 
-def create_correlation_matrix(rho, Y):
+def test_correlation_matrix(C, Cth, _G):
+    l, n, _ = _G.shape
+    assert l == 1
+
+    n,_ = Cth.shape
+    _Gp = _G*(_G > 0)
+    c = 0
+    for i in xrange(n):
+        sG = set(np.nonzero(_Gp[0,:,i])[0].tolist())
+        #pdb.set_trace()
+        if not len(sG):
+            continue
+        sC = set(np.nonzero(Cth[list(sG)[0]])[0].tolist())
+        sC = sC.union([i])
+        if not sG.issubset(sC):
+            #print 'Found weird correlation'
+            #pdb.set_trace()
+            #return False
+            c += 1
+    print 'Found weird correlations: %d, out of %d.' % (c, n)
+
+def create_correlation_matrix(rho, Y, _G):
     N, n = Y.shape
     C = Y.T.dot(Y)
-    C = threshold(C*(C > 2*rho*N/3.))
-    return C
+    Cth = threshold(C*(C > 2*rho*N/3.))
+    test_correlation_matrix(C, Cth, _G)
+    #pdb.set_trace()
+    return Cth
 
 def get_siblings(M, s):
     siblings = set(np.where(M[s,:] > 0)[0].tolist())    # all siblings of u, say v
     return siblings
+
+def test_and_permute_positive_edges(C, gplus, _G):
+    l, n, _ = _G.shape
+    assert l == 1
+
+    _Gplus = _G*(_G > 0)
+    gplus_sets = []
+    _Gplus_sets = []
+    gplus_new = np.zeros((n,n))
+    for i in xrange(n):
+        gplus_sets.append( set(np.nonzero(gplus[:,i])[0].tolist()) )
+        _Gplus_sets.append( set(np.nonzero(_Gplus[0,:,i])[0].tolist()) )
+
+    for i in xrange(n):
+        toret = False
+        g2 = _Gplus_sets[i]
+        for j in xrange(n):
+            g1 = gplus_sets[j]
+            
+            if (g1 <= g2) and (g2 <= g1):
+                toret = True
+                print 'gplus(%d) matches _Gplus(%d)' %(j, i)
+                print gplus_sets[j], _Gplus_sets[i]
+                gplus_new[list(gplus_sets[j]), i] = 1
+                #raw_input()
+                break
+        if not toret:
+            print 'one column wrong'
+            pdb.set_trace()
+    return gplus_new
+
 
 def find_positive_edges(d, C, _G):
     E = C.copy()
@@ -23,7 +77,10 @@ def find_positive_edges(d, C, _G):
     gplus = np.zeros((n,n))
     hcounter = 0
     
-    np.fill_diagonal(E, 0)
+    _Gplus = _G*(_G > 0)
+    _Gmnius = _G*(_G < 0)
+
+    #np.fill_diagonal(E, 0)
     while np.sum(E) > 1e-2:
         Er, Ec = np.nonzero(E)
         Eri = np.random.choice(len(Er))
@@ -46,7 +103,7 @@ def find_positive_edges(d, C, _G):
         '''
         if (len(S) > 0) and (len(S) < 1.3*d):
             Fhz = []
-            
+
             #print 'reached inside'
             for v in S:
                 Gammav = get_siblings(C, v)
@@ -55,15 +112,22 @@ def find_positive_edges(d, C, _G):
             
             lFhz = list(Fhz)
             #print 'lFhz', lFhz
+            positive_edges = set([])
             if len(lFhz):
-                gplus[lFhz, hcounter] = 1
+                positive_edges = lFhz
+            elif len(S) == 1:
+                positive_edges = list(S)
+            
+            if len(positive_edges):
+                gplus[positive_edges, hcounter] = 1
                 hcounter += 1
-                for v in lFhz:
-                    E[lFhz, v] = 0
-                #print 'added parents', len(Er)
-                
+                for v in positive_edges:
+                    E[positive_edges, v] = 0
+                print 'added parents', len(Er)
 
-    print 'gplus is sparse?: ', np.sum(np.abs(gplus))
+    print 'gplus has %d edges, Gplus has %d' % \
+        (np.sum(np.abs(gplus)), np.sum(np.abs(_Gplus)))
+    #gplus = test_and_permute_positive_edges(C, gplus, _G)
     return gplus
     
 
@@ -104,7 +168,7 @@ def learner(n, l, d, rho, Y, _G, _H):
     G  = []
     for i in xrange(l):
         rhoi = rho*(d/2.)**(l- (i+1))
-        C = create_correlation_matrix(rho=rhoi, Y=Yc)
+        C = create_correlation_matrix(rho=rhoi, Y=Yc, _G=_G)
         gplus = find_positive_edges(d, C, _G=_G)
         Hp = encode(d, gplus, Yc)
         
