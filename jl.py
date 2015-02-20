@@ -14,11 +14,11 @@ print d, eps, N, m
 raw_input()
 
 X = np.random.random((d, N))
-A = np.random.randn(m,d)
+A = np.random.randn(m,d)/np.sqrt(m)
 Y = A.dot(X)
 
 for i in xrange(N):
     for j in xrange(i):
         x = X[:,i]-X[:,j]
         y = A.dot(x)
-        print i,j, np.linalg.norm(y)**2/np.linalg.norm(x)**2/float(m) - 1
+        print i,j, np.linalg.norm(y)**2/np.linalg.norm(x)**2 - 1
